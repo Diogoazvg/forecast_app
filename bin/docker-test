@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Run the Minitest suite in the web container (RAILS_ENV=test).
+# Requires Docker, a built image (docker compose build), and .env with RAILS_MASTER_KEY.
+set -euo pipefail
+root=$(cd "$(dirname "$0")/.." && pwd)
+cd "$root"
+exec docker compose run --rm -e RAILS_ENV=test web bin/rails test "$@"
