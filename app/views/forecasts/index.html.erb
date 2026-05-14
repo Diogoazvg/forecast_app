@@ -1,0 +1,19 @@
+<% content_for :title, "Weather forecast" %>
+
+<main class="forecast">
+  <h1>Weather forecast</h1>
+  <p class="forecast__intro">Enter a US ZIP code (e.g. 90210) or a place name (e.g. Boston, MA). Results and caching will be wired in the next step.</p>
+
+  <% if flash[:alert] %>
+    <p class="forecast__flash forecast__flash--alert" role="alert"><%= flash[:alert] %></p>
+  <% end %>
+  <% if flash[:notice] %>
+    <p class="forecast__flash forecast__flash--notice"><%= flash[:notice] %></p>
+  <% end %>
+
+  <%= form_with url: forecasts_path, method: :post, local: true, class: "forecast__form" do %>
+    <label for="address">Address or ZIP</label>
+    <%= text_field_tag :address, params[:address], id: "address", autocomplete: "postal-code", placeholder: "90210 or Austin, TX", required: true %>
+    <%= submit_tag "Get forecast", name: nil %>
+  <% end %>
+</main>
