@@ -1,15 +1,30 @@
 class ForecastsController < ApplicationController
   def index
+    @address = params[:address]
 
+    @lookup =
+      if params[:zip].present?
+        ForecastLookup.for_zip(params[:zip])
+      elsif (key = params[:key].to_s).start_with?("coord:") && key.bytesize < 96
+        label = session.delete(:forecast_location_label)
+        ForecastLookup.for_coord_key(key, label)
+      end
+
+    @forecast = @lookup.forecast.with_indifferent_access if @lookup&.success?
   end
 
   def create
-    address = params[:address].to_s.strip
-    if address.blank?
-      redirect_to forecasts_path, alert: "Please enter a US ZIP code or a city and state."
+    resolved = AddressZipResolver.resolve(params[:address])
+    unless resolved.success?
+      redirect_to forecasts_path, alert: resolved.error
       return
     end
 
-    redirect_to forecasts_path, notice: "Lookup for \"#{address}\" will run here after the next change (API + caching)."
+    if resolved.cache_key.match?(/\A\d{5}\z/)
+      redirect_to forecasts_path(zip: resolved.cache_key)
+    else
+      session[:forecast_location_label] = resolved.label
+      redirect_to forecasts_path(key: resolved.cache_key)
+    end
   end
 end
