@@ -72,3 +72,82 @@
   background: #2563eb;
   color: #fff;
 }
+
+.forecast__results {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.forecast__results h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.forecast__cache {
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.9rem;
+}
+
+.forecast__cache--hit {
+  background: #eff6ff;
+  color: #1e3a8a;
+}
+
+.forecast__cache--miss {
+  background: #f7fee7;
+  color: #365314;
+}
+
+.forecast__current {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.75rem 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+}
+
+.forecast__current dt {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #6b7280;
+}
+
+.forecast__current dd {
+  margin: 0.15rem 0 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.forecast__subhead {
+  margin-top: 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.forecast__table {
+  width: 100%;
+  margin-top: 0.5rem;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.forecast__table th,
+.forecast__table td {
+  padding: 0.5rem 0.6rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.forecast__table th {
+  font-weight: 600;
+  color: #374151;
+}
+
+.forecast__meta {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  color: #6b7280;
+}

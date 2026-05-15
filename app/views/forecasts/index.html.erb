@@ -2,7 +2,7 @@
 
 <main class="forecast">
   <h1>Weather forecast</h1>
-  <p class="forecast__intro">Enter a US ZIP code (e.g. 90210) or a place name (e.g. Boston, MA). Results and caching will be wired in the next step.</p>
+  <p class="forecast__intro">US ZIP code or city and state.</p>
 
   <% if flash[:alert] %>
     <p class="forecast__flash forecast__flash--alert" role="alert"><%= flash[:alert] %></p>
@@ -11,9 +11,76 @@
     <p class="forecast__flash forecast__flash--notice"><%= flash[:notice] %></p>
   <% end %>
 
+  <% if @lookup && !@lookup.success? %>
+    <p class="forecast__flash forecast__flash--alert" role="alert"><%= @lookup.error %></p>
+  <% end %>
+
   <%= form_with url: forecasts_path, method: :post, local: true, class: "forecast__form" do %>
     <label for="address">Address or ZIP</label>
-    <%= text_field_tag :address, params[:address], id: "address", autocomplete: "postal-code", placeholder: "90210 or Austin, TX", required: true %>
+    <%= text_field_tag :address, @address, id: "address", autocomplete: "postal-code", placeholder: "90210 or Austin, TX", required: true %>
     <%= submit_tag "Get forecast", name: nil %>
+  <% end %>
+
+  <% if @forecast %>
+    <section class="forecast__results" aria-labelledby="forecast-results-heading">
+      <h2 id="forecast-results-heading"><%= @forecast[:location_label] %></h2>
+
+      <p class="forecast__cache <%= @lookup.from_cache ? "forecast__cache--hit" : "forecast__cache--miss" %>">
+        <% if @lookup.from_cache %>
+          Showing cached data (refreshes at most every 30 minutes for this ZIP or spot).
+        <% else %>
+          Fresh pull from the weather service; the next request for this spot may use the cache.
+        <% end %>
+      </p>
+
+      <dl class="forecast__current">
+        <div>
+          <dt>Current temperature</dt>
+          <dd><%= @forecast[:current_temp_f] %> °F</dd>
+        </div>
+        <% if @forecast[:apparent_temp_f].present? %>
+          <div>
+            <dt>Feels like</dt>
+            <dd><%= @forecast[:apparent_temp_f] %> °F</dd>
+          </div>
+        <% end %>
+        <% if @forecast[:humidity_pct].present? %>
+          <div>
+            <dt>Humidity</dt>
+            <dd><%= @forecast[:humidity_pct] %>%</dd>
+          </div>
+        <% end %>
+        <div>
+          <dt>Today high / low</dt>
+          <dd><%= @forecast[:high_today_f] %> °F / <%= @forecast[:low_today_f] %> °F</dd>
+        </div>
+      </dl>
+
+      <% if @forecast[:daily].present? %>
+        <h3 class="forecast__subhead">7-day outlook</h3>
+        <table class="forecast__table">
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">High (°F)</th>
+              <th scope="col">Low (°F)</th>
+              <th scope="col">Summary</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @forecast[:daily].each do |day| %>
+              <tr>
+                <td><%= day["date"] %></td>
+                <td><%= day["high_f"] %></td>
+                <td><%= day["low_f"] %></td>
+                <td><%= day["summary"] %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% end %>
+
+      <p class="forecast__meta">Last fetched at <%= @forecast[:fetched_at] %>.</p>
+    </section>
   <% end %>
 </main>
