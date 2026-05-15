@@ -6,15 +6,11 @@ services:
       - "${HOST_PORT:-3000}:80"
     environment:
       SOLID_QUEUE_IN_PUMA: "true"
-      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:?Set RAILS_MASTER_KEY in .env - see docker.env.example}
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:?}
     volumes:
-      # SQLite + uploads (keep across restarts)
       - forecast_app_storage:/rails/storage
-      # Use this repo’s app + config inside the container (no rebuild for route/controller/view changes).
-      # Precompiled assets stay from the image (./public is not mounted).
       - ./app:/rails/app:ro
       - ./config:/rails/config:ro
-      # For running tests in Docker without rebuilding the image (see bin/docker-test).
       - ./test:/rails/test:ro
       - ./db:/rails/db:ro
     restart: unless-stopped
