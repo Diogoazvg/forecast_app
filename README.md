@@ -51,7 +51,7 @@ Docker:
 docker compose up --build
 ```
 
-Then open `http://127.0.0.1:3000/forecasts`.
+Then open `http://127.0.0.1:3000`.
 
 Attention:
 - As this is a test, I've left the master.key in the repository to facilitate evaluation.
