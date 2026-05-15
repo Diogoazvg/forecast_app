@@ -66,6 +66,9 @@ or
 - An addrees like that "Los Altos Hills, CA"
 ```
 
+<img width="725" height="903" alt="image" src="https://github.com/user-attachments/assets/a342733e-d6da-46b0-88e8-1fe8617dc009" />
+
+
 ## How I approached it
 
 I built a clean, lightweight Rails app that takes a location, figures out where it is, grabs the weather, and caches it. I avoided bloated gems and database tables, keeping the architecture modular and easy to maintain.
