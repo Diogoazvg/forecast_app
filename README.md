@@ -76,8 +76,6 @@ The current version does what the exercise asked for, but it's clearly scoped to
 
 **When geocoding is ambiguous.** If someone types "Springfield" without a state, we basically take the first US hit. With more time I'd show a short list of matches and let them pick, instead of guessing wrong quietly.
 
-**Tests that actually exercise the interesting parts.** There's a smoke test on the form. I'd add service specs with WebMock around `AddressZipResolver` and `ForecastLookup` — cache hit vs miss, invalid ZIP, API timeout, that kind of thing. That's where bugs would show up, not in the controller.
-
 **Resilience when APIs flake.** `HttpJson` has timeouts, but if Open-Meteo is down you just get an error. I'd consider serving slightly stale cache on failure (stale-while-revalidate), or at least retries with backoff for transient 5xxs. Maybe log external call duration so you can see slowdowns in production.
 
 **Security and ops stuff for a real deploy.** For this exercise I left `master.key` in the repo so it's easy to run — that's called out above and wouldn't ship that way. I'd wire up proper secrets, rate limiting on the lookup endpoint so one client can't hammer the weather APIs, and maybe basic monitoring (structured logs, error tracking) once it's public.
