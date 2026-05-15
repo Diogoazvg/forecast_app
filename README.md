@@ -48,7 +48,7 @@ The app ships with Docker and docker-compose if you want to run it containerized
 Docker:
 
 ```bash
-docker compose up --build
+`docker compose up --build -d` or `docker compose up --build` to see the logs.
 ```
 
 Then open `http://127.0.0.1:3000`.
@@ -65,3 +65,19 @@ How to use the app:
 - You can inser a zipcode like that `94022` or a addrees like that `Los Altos Hills, CA`
 
 The forecast feature itself doesn't depend on you running migrations — there's no weather model in the database. Solid Cache/Queue use SQLite in production, but that's infrastructure Rails 8 sets up for caching and jobs, not for storing forecasts long-term.
+
+## If I had more time
+
+The current version does what the exercise asked for, but it's clearly scoped to US ZIPs and simple place names. Here's what I'd tackle next, roughly in the order I'd probably do it.
+
+**Broader location support.** Right now everything assumes US — Zippopotam only knows US ZIPs, and geocoding filters to `countryCode: US`. I'd drop that restriction and let people search by city or postal code in other countries (London, Toronto, etc.), probably leaning on Open-Meteo geocoding for most of it and only using a ZIP-specific API where it makes sense. Cache keys would need a country prefix or similar so `90210` in the US doesn't collide with something else.
+
+**Real street addresses.** The form says "address" but what actually works well is a ZIP or "city, state." Full addresses like `123 Main St, Austin, TX` aren't really handled. I'd either integrate a proper geocoder (Nominatim, Google Places, etc.) or be honest in the UI and rename the field to "ZIP or city" until that's built.
+
+**When geocoding is ambiguous.** If someone types "Springfield" without a state, we basically take the first US hit. With more time I'd show a short list of matches and let them pick, instead of guessing wrong quietly.
+
+**Tests that actually exercise the interesting parts.** There's a smoke test on the form. I'd add service specs with WebMock around `AddressZipResolver` and `ForecastLookup` — cache hit vs miss, invalid ZIP, API timeout, that kind of thing. That's where bugs would show up, not in the controller.
+
+**Resilience when APIs flake.** `HttpJson` has timeouts, but if Open-Meteo is down you just get an error. I'd consider serving slightly stale cache on failure (stale-while-revalidate), or at least retries with backoff for transient 5xxs. Maybe log external call duration so you can see slowdowns in production.
+
+**Security and ops stuff for a real deploy.** For this exercise I left `master.key` in the repo so it's easy to run — that's called out above and wouldn't ship that way. I'd wire up proper secrets, rate limiting on the lookup endpoint so one client can't hammer the weather APIs, and maybe basic monitoring (structured logs, error tracking) once it's public.
